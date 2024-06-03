@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
-import { WebCam_Window } from "../components/webcam";
+import { Button, ButtonGroup } from '@chakra-ui/react'
 
 export default function Home() {
-  const i = 1
   return (
-    <div>
-      <WebCam_Window />
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col justify-center items-center gap-4">
+        <h1>酔っ払いメーター</h1>
+        <Button colorScheme='teal' size='md'>ルーレットスタート！</Button>
+      </div>
     </div>
   );
 }
