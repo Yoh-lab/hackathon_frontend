@@ -15,7 +15,7 @@ const frameSize = {
 export const WebCam_Window = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false);
   const webcamRef = useRef<Webcam>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null); //useRef<型>(初期値)でconstを書き換え可能な「状態」に
 
   //画像反転関数
   const invertColors = async (imageData: ImageData) => {
@@ -28,6 +28,10 @@ export const WebCam_Window = () => {
     return imageData;
   };
 
+  // async()はコードの中で後回しにしていいよ（画像処理とか重いやつ）の明示
+  // async()の理由がawaitのところの処理
+  // await以降の処理はawaitのところが終わってから
+  // バックエンドのコードをAPIで走らせる予定
   const processFrame = async () => {
     if (webcamRef.current && canvasRef.current) {
       const webcam = webcamRef.current.video as HTMLVideoElement;
@@ -63,6 +67,16 @@ export const WebCam_Window = () => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
+      <div className="flex">
+        <input type="radio" name="hs-default-radio" className="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" id="hs-default-radio"/>
+        <label htmlFor="hs-default-radio" className="text-sm text-gray-500 ms-2 dark:text-neutral-400">Default radio</label>
+      </div>
+
+      <div className="flex">
+        <input type="radio" name="hs-default-radio" className="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" id="hs-checked-radio" />
+        <label htmlFor="hs-checked-radio" className="text-sm text-gray-500 ms-2 dark:text-neutral-400">Checked radio</label>
+      </div>
+
       <h1>カメラアプリ</h1>
       {isCaptureEnable || (
         <button onClick={() => setCaptureEnable(true)}>開始</button>
