@@ -97,6 +97,11 @@ export const WebCam_Window = () => {
           }
         }
 
+        // ここで処理された画像をcanvasに描画
+        const showImage = new Image();
+        showImage.src = `data:image/jpeg;base64,${processedImage}`;
+        ctx.drawImage(showImage, 0, 0, canvas.width, canvas.height);
+
       }else{
         console.log("Browser does not support canvas");
       }
@@ -109,7 +114,7 @@ export const WebCam_Window = () => {
 
   useEffect(() => {
     if (isCaptureEnable) {
-      console.log("processTrame Changing..."); // "processTrame Changing..."をコンソールに表示
+      console.log("processFrame Changing..."); // "processFrame Changing..."をコンソールに表示
 
       requestAnimationFrame(processFrame);
       // ページ遷移などコンポーネントが破棄されたときにループを止めなければならない
@@ -147,8 +152,13 @@ export const WebCam_Window = () => {
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
             />
-            <img // URLではなくデータURIで直接画像を埋め込む。`${変数}`はJavaScriptのテンプレートリテラルで変数を埋め込める
+            {/* <img // URLではなくデータURIで直接画像を埋め込む。`${変数}`はJavaScriptのテンプレートリテラルで変数を埋め込める
               src={`data:image/jpeg;base64,${processedImage}`} alt="Processed Image" 
+            /> */}
+            <canvas
+              ref={canvasRef}
+              width={frameSize.width}
+              height={frameSize.height}
             />
           </div>
         </>
