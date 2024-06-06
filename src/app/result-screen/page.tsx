@@ -1,13 +1,15 @@
 "use client";
 
-import Image from "next/image";
+import { Flex, Box } from "@chakra-ui/react";
+import { Text } from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
+import Link from 'next/link';
 
 
 export default function Home() {
-  const i = 1
   return (
-    <div>
-      あなたの結果は.........！
-    </div>
+    <Flex direction="column" align="center" justify="center" minH="100vh" gap={20}>
+      <Text fontSize='4xl'>あなたの結果は.........</Text>
+    </Flex>
   );
 }

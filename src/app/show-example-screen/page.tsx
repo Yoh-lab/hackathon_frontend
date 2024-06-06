@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <Flex direction="column" align="center" justify="center" minH="100vh" gap={20}>
       <ShowPose />
-      <Link href="/show-example-screen"><Button colorScheme='teal' size='md'>撮影開始！</Button></Link>
+      <Link href="/shooting-screen"><Button colorScheme='teal' size='md'>撮影開始！</Button></Link>
     </Flex>
   );
 }

@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
+import { Text } from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
 
 // Webカメラの設定（解像度やカメラの向き）
 const videoConstraints = {
@@ -121,14 +123,14 @@ export const WebCam_Window = () => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <h1>カメラアプリ</h1>
+      <Text fontSize='4xl'>カメラアプリ</Text>
       {isCaptureEnable || (
-        <button onClick={() => setCaptureEnable(true)}>開始</button>
+        <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(true)}>撮影開始～！</Button>
       )}
       {isCaptureEnable && (
         <>
           <div>
-            <button onClick={() => setCaptureEnable(false)}>終了</button>
+          <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(false)}>撮影終了～！</Button>
           </div>
           <div
             style={{
