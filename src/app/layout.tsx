@@ -1,8 +1,8 @@
 import { Providers } from './providers'
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"] });
+import { RocknRoll_One } from "next/font/google";
+const rocknRollOne = RocknRoll_One({ subsets: ["latin"], weight: ["400"]});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}><Providers>{children}</Providers></body>
+    <html lang="ja">
+      <body className={rocknRollOne.className}><Providers>{children}</Providers></body>
     </html>
   );
 }

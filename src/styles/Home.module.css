@@ -1,0 +1,10 @@
+/* Home.module.css */
+.background {
+    background-color: #7648ec;
+    min-height: 100vh;
+}
+
+.text {
+    color: #F6F9F4;
+    font-size: 4rem;
+}
