@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+import { Flex, Box } from "@chakra-ui/react";
+import { Text } from '@chakra-ui/react'
+import { Button, ButtonGroup } from '@chakra-ui/react'
+
 export const Roulette = () => {
-  const items = ['ポーズA','ポーズB','ポーズC'];
+  const items = ['ポーズA','ポーズB','ポーズC','ポーズD'];
   const [currentItem, setCurrentItem] = useState<string>(items[0]);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [result, setResult] = useState<string | null>(null);
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -28,37 +31,17 @@ export const Roulette = () => {
     };
   }, [isRunning]);
 
-  const startRoulette = () => {
-    setResult(null);
-    setIsRunning(true);
-  };
-
-  const stopRoulette = () => {
-    if (isRunning) {
-      setIsRunning(false);
-      setTimeout(() => {
-        setResult(currentItem);
-      }, 1000); // ルーレットが停止した後に結果を表示
-    }
-  };
-
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>ルーレット</h1>
-      <div style={{ fontSize: '50px', margin: '20px' }}>{currentItem}</div>
-      <div>
-        <button onClick={startRoulette} disabled={isRunning}>
-          開始
-        </button>
-        <button onClick={stopRoulette} disabled={!isRunning}>
-          停止
-        </button>
-      </div>
-      {result && (
-        <div style={{ marginTop: '20px', fontSize: '30px' }}>
-          結果: {result}
+    <Flex direction="column" align="center" justify="center" gap={20}>
+      <Text fontSize='4xl'>{currentItem}</Text>
+      {isRunning || (
+        <Button colorScheme='teal' size='md' onClick={() => setIsRunning(true)}>ルーレットスタート！</Button>
+      )}
+      {isRunning && (
+        <div>
+        <Button colorScheme='teal' size='md' onClick={() => setIsRunning(false)}>ルーレットストップ！</Button>
         </div>
       )}
-    </div>
+    </Flex>
   );
 };
