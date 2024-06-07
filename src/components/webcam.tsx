@@ -100,7 +100,7 @@ export const WebCam_Window = () => {
         // ここで処理された画像をcanvasに描画
         const showImage = new Image();
         showImage.src = `data:image/jpeg;base64,${processedImage}`;
-        ctx.drawImage(showImage, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(showImage, 0, 0, frameSize.width, frameSize.height);
 
       }else{
         console.log("Browser does not support canvas");
