@@ -11,7 +11,6 @@ export default function Home() {
   return (
     <Flex direction="column" align="center" justify="center" minH="100vh" gap={20}>
       <Roulette />
-      <Button colorScheme='teal' size='md'>ルーレットスタート！</Button>
       <Link href="/show-example-screen"><Button colorScheme='teal' size='md'>ポーズ例を見てみよう！</Button></Link>
     </Flex>
   );
