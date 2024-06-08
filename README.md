@@ -6,6 +6,8 @@ First, run the development server:
 
 npm install
 
+npm i @chakra-ui/icons
+
 ```bash
 npm run dev
 # or

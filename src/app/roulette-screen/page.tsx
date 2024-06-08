@@ -1,17 +1,20 @@
 "use client";
 
-import { Flex, Box } from "@chakra-ui/react";
-import { Text } from '@chakra-ui/react'
-import { Button, ButtonGroup } from '@chakra-ui/react'
-import Link from 'next/link';
+
+import { Flex } from "@chakra-ui/react";
+import styles from '../../styles/Home.module.css';
+
+import React from 'react';
 
 import { Roulette } from "../../components/roulette";
 
+
 export default function Home() {
   return (
-    <Flex direction="column" align="center" justify="center" minH="100vh" gap={20}>
-      <Roulette />
-      <Link href="/show-example-screen"><Button colorScheme='teal' size='md'>ポーズ例を見てみよう！</Button></Link>
-    </Flex>
+    <main className={styles.background}>
+      <Flex direction="column" align="center" justify="center" minH="100vh" gap={20}>
+        <Roulette />
+      </Flex>
+    </main>
   );
 }
