@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Text } from '@chakra-ui/react'
-import { Button, ButtonGroup } from '@chakra-ui/react'
+import { Flex, Box } from "@chakra-ui/react";
 import CustomButton from './customButton';
 import { usePoseImages } from '../app/contexts/poseImagesContext';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
@@ -34,18 +34,16 @@ export const WebCam_Window = () => {
   const { setSimilarityScore } = useSimilarityScore();
 
   // 正解画像のCanvasを作る
-  // ポーズ名と画像のURLの配列をposeImagesContext.tsxから取得する
+  // // ポーズ名と画像のURLの配列をposeImagesContext.tsxから取得する
   const poseImages = usePoseImages();
-  // ルーレットで当たったポーズをcurrentPoseName.tsxから取得する
+  // // ルーレットで当たったポーズをcurrentPoseName.tsxから取得する
   const { currentPoseName } = useCurrentPoseName();
-  // ポーズ名に一致する要素を探す
+  // // ポーズ名に一致する要素を探す
   const currentPoseImage = poseImages.find((item) => item.name === currentPoseName)
-  // 正解画像のCanvas
+  // // 正解画像のCanvas
   const correctCanvasRef = useRef<HTMLCanvasElement>(null);
   const correctCanvas = correctCanvasRef.current;
-
-  // 画像をロードしてCanvasに描画する関数
-  // 画像をロードしてCanvasに描画する関数
+  // // 画像をロードしてCanvasに描画する関数
   function loadImageToCanvas(imageUrl: string, canvas: HTMLCanvasElement) {
       const ctx= canvas.getContext('2d');
       if (ctx) {
@@ -60,8 +58,7 @@ export const WebCam_Window = () => {
         };
     } 
   }
-
-  // 画像URLとCanvas要素を渡して関数を呼び出す
+  // // 画像URLとCanvas要素を渡して関数を呼び出す
   if (currentPoseImage){
     const imageUrl = currentPoseImage.imageSrc;
     if (imageUrl && correctCanvas) {
@@ -79,6 +76,7 @@ export const WebCam_Window = () => {
     });
   }
   
+  // webcamの取得画像のcanvasと正解画像のcorrectCanvasをバックエンドに渡し、処理画像と類似度の値を得る
   const uploadImage = async (canvas: HTMLCanvasElement, correctCanvas: HTMLCanvasElement) => {
     const blob = await getCanvasBlob(canvas);
     const correctBlob = await getCanvasBlob(correctCanvas);
@@ -97,16 +95,11 @@ export const WebCam_Window = () => {
       if (!response.ok) {
         throw new Error("Failed to upload image");
       }
-      const data = await response.blob();
 
-      // レスポンスのスコアを取得 (仮定としてJSONの一部から取得する場合)
-      const scoreResponse = await fetch('upload/score', {
-          method: 'GET'
-      });
-      const scoreData = await scoreResponse.json();
-      const score = scoreData.score;
+      const image = await response.blob();
+      const score = await Number(response.headers.get("score"));
 
-      return { image: data, score: score };
+      return { image: image, score: score };
     } catch (error) {
       console.error("Error uploading image:", error);
       throw error;
@@ -146,6 +139,7 @@ export const WebCam_Window = () => {
           // 1フレームごとの類似度のスコアを保存
           similarityScoreList.push(result.score)
 
+          
         } catch (error) {
           console.error("Error during image upload:", error);
         }
@@ -210,32 +204,30 @@ export const WebCam_Window = () => {
       )}
       {isCaptureEnable && (
         <>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Webcam //以下は全部Webcamコンポーネントに渡されるprops
-              audio={false}
-              width={frameSize.width}
-              height={frameSize.height}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={videoConstraints}
-            />
-            <canvas
-              ref={canvasRef}
-              width={frameSize.width}
-              height={frameSize.height}
-            />
-            <canvas
-              ref={correctCanvasRef}
-              width={frameSize.width}
-              height={frameSize.height}
-            />
-          </div>
+          <Flex direction="column" align="center" justify="center" gap={20}>
+            <Flex align="center" justify="center" gap={20}>
+              <Webcam //以下は全部Webcamコンポーネントに渡されるprops
+                audio={false}
+                width={frameSize.width}
+                height={frameSize.height}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={videoConstraints}
+              />
+              <canvas
+                ref={correctCanvasRef}
+                width={frameSize.width}
+                height={frameSize.height}
+              />
+            </Flex>
+            <Box height="60%">
+              <canvas
+                ref={canvasRef}
+                width={frameSize.width}
+                height={frameSize.height}
+              />
+            </Box>
+          </Flex>
           <div>
             <CustomButton
               width="450px"
