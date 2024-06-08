@@ -1,4 +1,4 @@
-// 現在表示されているポーズ名を示す状態をコンポーネント間で共有するコンテキスト
+// 現在ルーレット画面で表示されているポーズ名を示す状態をコンポーネント間で共有するコンテキスト
 
 'use client'
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState, } from 'react';

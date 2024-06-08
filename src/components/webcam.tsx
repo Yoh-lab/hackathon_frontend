@@ -3,6 +3,8 @@ import Webcam from "react-webcam";
 import { Text } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import CustomButton from './customButton';
+import { usePoseImages } from '../app/contexts/poseImagesContext';
+import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
 
 // Webカメラの設定（解像度やカメラの向き）
 const videoConstraints = {
@@ -23,8 +25,42 @@ export const WebCam_Window = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const saveCanvasRef = useRef<HTMLCanvasElement>(null);
   const [processedImage, setProcessedImage] = useState<string>("");
-    const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
+  const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
 
+  // 正解画像のCanvasを作る
+  // ポーズ名と画像のURLの配列をposeImagesContext.tsxから取得する
+  const poseImages = usePoseImages();
+  // ルーレットで当たったポーズをcurrentPoseName.tsxから取得する
+  const { currentPoseName } = useCurrentPoseName();
+  // ポーズ名に一致する要素を探す
+  const currentPoseImage = poseImages.find((item) => item.name === currentPoseName)
+  // 正解画像のCanvas
+  const correctCanvasRef = useRef<HTMLCanvasElement>(null);
+  const correctCanvas = correctCanvasRef.current;
+
+  // 画像をロードしてCanvasに描画する関数
+  // 画像をロードしてCanvasに描画する関数
+  function loadImageToCanvas(imageUrl: string, canvas: HTMLCanvasElement) {
+      const ctx= canvas.getContext('2d');
+      if (ctx) {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+    } 
+  }
+
+  // 画像URLとCanvas要素を渡して関数を呼び出す
+  if (currentPoseImage){
+    const imageUrl = currentPoseImage.imageSrc;
+    if (imageUrl && correctCanvas) {
+      loadImageToCanvas(imageUrl, correctCanvas);
+    }
+  } 
+  
+
+  // Blobはバイナリデータを表現するためのオブジェクトで、通常画像や動画などのメディアデータを表現
   function getCanvasBlob(canvas: HTMLCanvasElement) {
     return new Promise((resolve) => {
       canvas.toBlob((blob) => {
@@ -33,10 +69,14 @@ export const WebCam_Window = () => {
     });
   }
   
-  const uploadImage = async (canvas: HTMLCanvasElement) => {
+  const uploadImage = async (canvas: HTMLCanvasElement, correctCanvas: HTMLCanvasElement) => {
     const blob = await getCanvasBlob(canvas);
+    const correctBlob = await getCanvasBlob(correctCanvas);
+    // FormDataは、フォームデータをキー/値のペアとしてエンコードするためのオブジェクトで、HTTPリクエストで送信する際に使用
     const formData = new FormData();
+    // 第一引数にはキーを指定し、第二引数には追加する値、第三引数には、データの名前やファイル名を指定
     formData.append("data", blob as File, "canvas.png");
+    formData.append("data", correctBlob as File, "correctCanvas.png");
     try {
       const response = await fetch("http://localhost:8000", {
         method: "POST",
@@ -48,8 +88,7 @@ export const WebCam_Window = () => {
         throw new Error("Failed to upload image");
       }
       const data = await response.blob();
-      // 処理された画像を状態に反映
-      // setProcessedImage(data);
+
       return data;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -69,14 +108,15 @@ export const WebCam_Window = () => {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d"); //ctxを用いて描画コンテキストにアクセス可能
 
-      if (ctx && webcamCanvas) {
+      if (ctx && webcamCanvas && correctCanvas) {
         // 仮想的に0．5秒待機する（これをコメントアウトすればスムーズに動く）
         // await new Promise((resolve) => setTimeout(resolve, 100));
         try {
-          const result = await uploadImage(webcamCanvas as HTMLCanvasElement);
+          const result = await uploadImage(webcamCanvas as HTMLCanvasElement, correctCanvas);
           // 画像処理後の画像をcanvasに描画
           const img = new Image();
           img.src = URL.createObjectURL(new Blob([result]));
+          // img.onload: 画像のロードが完了したときに呼び出されるコールバック関数
           img.onload = () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           };
