@@ -5,6 +5,7 @@ import { Text } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
 import Link from 'next/link';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
+import CustomButton from './customButton';
 
 // createContextでitemをコンポーネント間で共有できるようにする
 export const ItemContext = createContext('')
@@ -67,7 +68,20 @@ export const Roulette = () => {
         </div>
       )}
       {isPoseSelected &&(
-        <Link href="/show-example-screen"><Button colorScheme='teal' size='md'>ポーズ例を見てみよう！</Button></Link>
+        <Link href="/show-example-screen">
+          <CustomButton
+            to="/show-example-screen"
+            width="450px"
+            height="65px"
+            fontSize="30px"
+            padding="1.5rem"
+            buttonColor="#F6F9F4" // ボタンの背景色
+            textColor="#7648ec" // 文字の色
+            iconSize="20px" // アイコンのサイズ
+          >
+            ポーズ例を見てみよう！
+          </CustomButton>
+        </Link>
       )}
     </Flex>
   );

@@ -27,7 +27,6 @@ export default function Home() {
           textColor="#7648ec" // 文字の色
           iconSize="20px" // アイコンのサイズ
         >
-          ポーズ例を見てみよう！　
         </CustomButton>
       </Flex>
     </main>

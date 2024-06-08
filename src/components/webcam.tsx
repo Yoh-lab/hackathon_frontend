@@ -128,9 +128,11 @@ export const WebCam_Window = () => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <Text fontSize='4xl'>カメラアプリ</Text>
       {isCaptureEnable || (
-        <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(true)}>撮影開始～！</Button>
+        <>
+          <Text fontSize='4xl'>カメラアプリ</Text>
+          <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(true)}>撮影開始～！</Button>
+        </>
       )}
       {isCaptureEnable && (
         <>
