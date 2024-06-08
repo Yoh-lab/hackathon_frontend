@@ -1,4 +1,5 @@
 import { Providers } from './providers'
+import { CurrentPoseNameProvider } from './contexts/currentPoseNameContext';
 
 import type { Metadata } from "next";
 import { RocknRoll_One } from "next/font/google";
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={rocknRollOne.className}><Providers>{children}</Providers></body>
+      <body className={rocknRollOne.className}><CurrentPoseNameProvider><Providers>{children}</Providers></CurrentPoseNameProvider></body>
     </html>
   );
 }
