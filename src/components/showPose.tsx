@@ -5,10 +5,9 @@ import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
 
 // ポーズ名と画像のURLの配列
 const poseImages = [
-    {name: 'ポーズA', src: 'URL'},
-    {name: 'ポーズB', src: 'URL'},
-    {name: 'ポーズC', src: 'URL'},
-    {name: 'ポーズD', src: 'URL'},
+    {name: 'なんちゃってヨガ', src: 'URL'},
+    {name: 'さかな~', src: 'URL'},
+    {name: 'コナン', src: 'URL'},
 ];
 
 //ルーレットで当たったポーズの画像を描画する

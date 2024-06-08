@@ -17,7 +17,8 @@ interface CustomButtonProps {
   onClick?: () => void;
 }
 
-export default function CustomButton({ to='', width, height, fontSize, padding, children, buttonColor='teal', textColor='white', iconSize='1em', onClick,}: CustomButtonProps) {
+export default function CustomButton({ to='', width, height, fontSize, padding, children, buttonColor='teal', textColor='white', iconSize='1em', onClick, }: CustomButtonProps) {
+
   return (
     <Link href={to}>
       <Box width={width} height={height}>
