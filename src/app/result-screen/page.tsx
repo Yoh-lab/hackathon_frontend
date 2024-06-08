@@ -15,7 +15,7 @@ import { useSimilarityScore } from "../contexts/similarityScoreContext";
 
 // 類似度と酔っ払いタイプの配列
 const drunkTypes = [
-  {score: 25, type: '../../../drunktypes/drunk20.svg'},
+  {score: 25, type: '../../../drunktypes/drunk25.svg'},
   {score: 50, type: '../../../drunktypes/drunk50.svg'},
   {score: 75, type: '../../../drunktypes/drunk75.svg'},
   {score: 100, type: '../../../drunktypes/drunk100.svg'},
@@ -30,13 +30,13 @@ export default function Home() {
   return (
     <main className={styles.background}>
       <Box height="100%">
-        <Box height="20%">
+        <Box height="20%" mb={20}>
           <Example activeIndex={4} />
         </Box>
         {/* vhでレイアウトは調節しよう！ */}
         <Flex direction="column" justify="center" minH="80vh" gap={5}>
           <ResultBar />
-          <Flex direction="column" align="center" justify="center" minH="40vh" gap={20}>
+          <Flex direction="column" align="center" justify="center" minH="40vh" gap={10}>
             {/* <Text className={styles.text} align="center">{drunkTypes[drunkTypeIndex].type}</Text> */}
             <Image src={drunkTypes[drunkTypeIndex].type} alt="酔っ払いタイプ" className={styles.text} />
             <CustomButton
