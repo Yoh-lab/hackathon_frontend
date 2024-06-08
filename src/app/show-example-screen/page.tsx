@@ -16,7 +16,9 @@ export default function Home() {
           <Example activeIndex={2} />
         </Box>
         <Flex direction="column" align="center" justify="center" minH="80vh" gap={20}>
-          <ShowPose />
+          <div style={{width: '60%', height: 'auto',}}>
+            <ShowPose />
+          </div>
           <CustomButton
               to="/shooting-screen"
               width="450px"
@@ -27,7 +29,7 @@ export default function Home() {
               textColor="#7648ec" // 文字の色
               iconSize="20px" // アイコンのサイズ
             >
-              撮影スタート！　
+              撮影スタート！
             </CustomButton>
         </Flex>
       </Box>
