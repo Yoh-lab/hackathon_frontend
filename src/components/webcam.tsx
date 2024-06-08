@@ -18,57 +18,45 @@ const frameSize = {
 };
 
 export const WebCam_Window = () => {
-  // isCaptureEnable: キャプチャが有効かどうかの状態
-  // setCaptureEnable: isCaptureEnableを更新するための関数
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false);
-  // useRef<型>(初期値)でconstを書き換え可能な「状態」に(useStateと違って値が変わっても再レンダリングされない)
-  // Webcamコンポーネントへの参照
   const webcamRef = useRef<Webcam>(null);
-  // canvas要素への参照
-  // <canvas> は固定された大きさの描画可能領域（描画コンテキスト）を作成
-  const canvasRef = useRef<HTMLCanvasElement>(null); 
-  // 処理された画像を保存するための状態
-  // Base64形式でエンコードされた画像を表す文字列
-  const [processedImage, setProcessedImage] = useState<string>('')
-  // 撮影が終わったかどうか
-  const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const saveCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [processedImage, setProcessedImage] = useState<string>("");
+    const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
 
-
-  //Base64形式でエンコードした画像をバックエンドに送って処理された画像Base64形式で受け取る関数
-  const uploadImage = async (imageSrc: String) => {
-    try {
-      // Fetch APIを使ったPOSTリクエスト
-      // responseはHTTPリクエストに対するサーバーからの応答されるオブジェクト
-      const response = await fetch('http://localhost:8000', {
-        // HTTPメソッドを指定
-        method: 'POST', 
-        // リクエストタイプを設定（今回はリクエストボディがJSON形式であることを明示）
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        // リクエストボディとして画像データをJSON形式で送信
-        body: JSON.stringify({ image: imageSrc })
-      });
+  function getCanvasBlob(canvas: HTMLCanvasElement) {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, "image/png");
+    });
+  }
   
+  const uploadImage = async (canvas: HTMLCanvasElement) => {
+    const blob = await getCanvasBlob(canvas);
+    const formData = new FormData();
+    formData.append("data", blob as File, "canvas.png");
+    try {
+      const response = await fetch("http://localhost:8000", {
+        method: "POST",
+        body: formData,
+      });
+
       // response.okはレスポンスが成功したかどうかを示すブール値
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Failed to upload image");
       }
-  
-      // response.json();には処理された画像(processed_image)がBase64形式で返却される想定
-      const data = await response.json();
+      const data = await response.blob();
       // 処理された画像を状態に反映
-      setProcessedImage(data.processed_image)
-
-      console.log('Image uploaded successfully:', data);
+      // setProcessedImage(data);
       return data;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       throw error;
     }
   };
 
-  
   // Webcamの毎フレームに対してバックエンド処理を行う関数
   const reqIdRef = useRef<number>(0); // 無限ループを止めるcancelAnimationFrameのためのrequestID
   // async()はコードの中で後回しにしていいよ（画像処理とか重いやつ）の明示
@@ -76,36 +64,27 @@ export const WebCam_Window = () => {
   // await以降の処理はawaitのところが終わってから
   const processFrame = async () => {
     if (webcamRef.current && canvasRef.current) {
-      const webcam = webcamRef.current.video as HTMLVideoElement;
+      // const webcam = webcamRef.current.video as HTMLVideoElement;
+      const webcamCanvas = webcamRef.current.getCanvas();
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d"); //ctxを用いて描画コンテキストにアクセス可能
 
-      if (ctx) {
+      if (ctx && webcamCanvas) {
         // 仮想的に0．5秒待機する（これをコメントアウトすればスムーズに動く）
-        //await new Promise((resolve) => setTimeout(resolve, 500));
-        
-        // 左右反転せずに画像を描画
-        ctx.drawImage(webcam, 0, 0, canvas.width, canvas.height);
-        // キャンバスの内容をBase64エンコードされたJPEG画像のデータURI(画像を表現する文字列)として取得
-        const imageSrc = canvas.toDataURL("image/jpeg");
-
-    
-        // 画像をバックエンドに送って処理を行う
-        if (imageSrc) {
-          try {
-            const result = await uploadImage(imageSrc);
-            console.log('Upload result:', result);
-          } catch (error) {
-            console.error('Error during image upload:', error);
-          }
+        // await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          const result = await uploadImage(webcamCanvas as HTMLCanvasElement);
+          // 画像処理後の画像をcanvasに描画
+          const img = new Image();
+          img.src = URL.createObjectURL(new Blob([result]));
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          };
+          //resultは画像処理後の画像．これをcanvasに描画
+        } catch (error) {
+          console.error("Error during image upload:", error);
         }
-
-        // ここで処理された画像をcanvasに描画
-        const showImage = new Image();
-        showImage.src = `data:image/jpeg;base64,${processedImage}`;
-        ctx.drawImage(showImage, 0, 0, frameSize.width, frameSize.height);
-
-      }else{
+      } else {
         console.log("Browser does not support canvas");
       }
     }
@@ -113,7 +92,6 @@ export const WebCam_Window = () => {
     // 次のフレームの描画を予約
     reqIdRef.current = requestAnimationFrame(processFrame);
   };
-
 
   useEffect(() => {
     if (isCaptureEnable) {
@@ -126,6 +104,7 @@ export const WebCam_Window = () => {
     }
   }, [isCaptureEnable]);
 
+
   // 撮影止めたとき
   const stopCapture = () => {
     setCaptureEnable(false);
@@ -136,6 +115,7 @@ export const WebCam_Window = () => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
+
       {isCaptureFinished || isCaptureEnable || (
         <>
           <Text fontSize='4xl'>準備OK？？</Text>
