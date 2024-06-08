@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useRef } from 'react';
 import { Flex, Box } from "@chakra-ui/react";
 import { Text } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
+import Link from 'next/link';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
 
 // createContextでitemをコンポーネント間で共有できるようにする
@@ -17,6 +18,8 @@ export const Roulette = () => {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   // setIntervalのIDを保持
   const intervalRef = useRef<number | null>(null);
+  // ポーズが決まったかどうか
+  const [isPoseSelected, setIsPoseSelected] = useState<boolean>(false);
 
   useEffect(() => {
     // ルーレット回転中
@@ -46,16 +49,25 @@ export const Roulette = () => {
     };
   }, [isRunning]);
 
+  // ルーレット止めたとき
+  const stopRoulette = () => {
+    setIsRunning(false);
+    setIsPoseSelected(true)
+  }
+
   return (
     <Flex direction="column" align="center" justify="center" gap={20}>
       <Text fontSize='4xl'>{currentPoseName}</Text>
-      {isRunning || (
+      {isPoseSelected || isRunning || (
         <Button colorScheme='teal' size='md' onClick={() => setIsRunning(true)}>ルーレットスタート！</Button>
       )}
       {isRunning && (
         <div>
-        <Button colorScheme='teal' size='md' onClick={() => setIsRunning(false)}>ルーレットストップ！</Button>
+        <Button colorScheme='teal' size='md' onClick={stopRoulette}>ルーレットストップ！</Button>
         </div>
+      )}
+      {isPoseSelected &&(
+        <Link href="/show-example-screen"><Button colorScheme='teal' size='md'>ポーズ例を見てみよう！</Button></Link>
       )}
     </Flex>
   );
