@@ -6,13 +6,14 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import Link from 'next/link';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
 import CustomButton from './customButton';
+import { usePoseImages } from '../app/contexts/poseImagesContext';
 
-// createContextでitemをコンポーネント間で共有できるようにする
-export const ItemContext = createContext('')
 
 export const Roulette = () => {
+  // ポーズ名と画像のURLの配列をposeImagesContext.tsxから取得する
+  const poseImages = usePoseImages();
   // ルーレットの項目リスト
-  const items = ['なんちゃってヨガ', 'さかな~', 'コナン'];
+  const items = poseImages.map((item) => (item.name));
   // 現在表示されているルーレットの項目を示す状態
   const { currentPoseName, setCurrentPoseName } = useCurrentPoseName();
   // ルーレットが回転しているかどうかの状態

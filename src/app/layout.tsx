@@ -1,6 +1,7 @@
 import { Providers } from './providers'
 import { CurrentPoseNameProvider } from './contexts/currentPoseNameContext';
 import { SimilarityScoreProvider } from './contexts/similarityScoreContext';
+import { PoseImagesProvider } from './contexts/poseImagesContext';
 
 import type { Metadata } from "next";
 import { RocknRoll_One } from "next/font/google";
@@ -19,13 +20,15 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={rocknRollOne.className}>
-        <SimilarityScoreProvider>
-          <CurrentPoseNameProvider>
-            <Providers>
-              {children}
-            </Providers>
-          </CurrentPoseNameProvider>
-        </SimilarityScoreProvider>
+        <PoseImagesProvider>
+          <SimilarityScoreProvider>
+            <CurrentPoseNameProvider>
+              <Providers>
+                {children}
+              </Providers>
+            </CurrentPoseNameProvider>
+          </SimilarityScoreProvider>
+        </PoseImagesProvider>
       </body>
     </html>
   );
