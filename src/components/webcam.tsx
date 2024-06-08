@@ -220,7 +220,7 @@ export const WebCam_Window = () => {
                 height={frameSize.height}
               />
             </Flex>
-            <Box height="60%">
+            <Box height="40%">
               <canvas
                 ref={canvasRef}
                 width={frameSize.width}

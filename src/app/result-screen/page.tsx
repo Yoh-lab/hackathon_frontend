@@ -48,7 +48,7 @@ export default function Home() {
                 textColor="#7648ec" // 文字の色
                 iconSize="30px" // アイコンのサイズ
               >
-              最初に戻る　
+              最初に戻る 
               </CustomButton>
            </Flex>
         </Flex>
