@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Text } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
+import CustomButton from './customButton';
 
 // Webカメラの設定（解像度やカメラの向き）
 const videoConstraints = {
@@ -29,6 +30,8 @@ export const WebCam_Window = () => {
   // 処理された画像を保存するための状態
   // Base64形式でエンコードされた画像を表す文字列
   const [processedImage, setProcessedImage] = useState<string>('')
+  // 撮影が終わったかどうか
+  const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
 
 
   //Base64形式でエンコードした画像をバックエンドに送って処理された画像Base64形式で受け取る関数
@@ -123,22 +126,35 @@ export const WebCam_Window = () => {
     }
   }, [isCaptureEnable]);
 
+  // 撮影止めたとき
+  const stopCapture = () => {
+    setCaptureEnable(false);
+    setIsCaptureFinished(true)
+  }
 
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {isCaptureEnable || (
+      {isCaptureFinished || isCaptureEnable || (
         <>
-          <Text fontSize='4xl'>カメラアプリ</Text>
-          <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(true)}>撮影開始～！</Button>
+          <Text fontSize='4xl'>準備OK？？</Text>
+          <CustomButton
+            width="450px"
+            height="65px"
+            fontSize="30px"
+            padding="1.5rem"
+            buttonColor="#F6F9F4" // ボタンの背景色
+            textColor="#7648ec" // 文字の色
+            iconSize="20px" // アイコンのサイズ
+            onClick={() => setCaptureEnable(true)}
+          >
+            撮影開始～！
+          </CustomButton>
         </>
       )}
       {isCaptureEnable && (
         <>
-          <div>
-          <Button colorScheme='teal' size='md' onClick={() => setCaptureEnable(false)}>撮影終了～！</Button>
-          </div>
           <div
             style={{
               display: "flex",
@@ -163,7 +179,35 @@ export const WebCam_Window = () => {
               height={frameSize.height}
             />
           </div>
+          <div>
+            <CustomButton
+              width="450px"
+              height="65px"
+              fontSize="30px"
+              padding="1.5rem"
+              buttonColor="#F6F9F4" // ボタンの背景色
+              textColor="#7648ec" // 文字の色
+              iconSize="20px" // アイコンのサイズ
+              onClick={stopCapture}
+            >
+              撮影終了～！
+            </CustomButton>
+          </div>
         </>
+      )}
+      {isCaptureFinished &&(
+        <CustomButton
+          to="/result-screen"
+          width="450px"
+          height="75px"
+          fontSize="40px"
+          padding="1.5rem"
+          buttonColor="#F6F9F4" // ボタンの背景色
+          textColor="#7648ec" // 文字の色
+          iconSize="30px" // アイコンのサイズ
+        >
+          診断結果は～？
+        </CustomButton>
       )}
     </div>
   );

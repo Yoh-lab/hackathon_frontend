@@ -60,28 +60,46 @@ export const Roulette = () => {
     <Flex direction="column" align="center" justify="center" gap={20}>
       <Text fontSize='4xl'>{currentPoseName}</Text>
       {isPoseSelected || isRunning || (
-        <Button colorScheme='teal' size='md' onClick={() => setIsRunning(true)}>ルーレットスタート！</Button>
+        <CustomButton
+          width="450px"
+          height="65px"
+          fontSize="30px"
+          padding="1.5rem"
+          buttonColor="#F6F9F4" // ボタンの背景色
+          textColor="#7648ec" // 文字の色
+          iconSize="20px" // アイコンのサイズ
+          onClick={() => setIsRunning(true)}
+        >
+          ルーレットスタート！
+        </CustomButton>
       )}
       {isRunning && (
-        <div>
-        <Button colorScheme='teal' size='md' onClick={stopRoulette}>ルーレットストップ！</Button>
-        </div>
+        <CustomButton
+          width="450px"
+          height="65px"
+          fontSize="30px"
+          padding="1.5rem"
+          buttonColor="#F6F9F4" // ボタンの背景色
+          textColor="#7648ec" // 文字の色
+          iconSize="20px" // アイコンのサイズ
+          onClick={stopRoulette}
+        >
+          ルーレットストップ！
+        </CustomButton>
       )}
       {isPoseSelected &&(
-        <Link href="/show-example-screen">
-          <CustomButton
-            to="/show-example-screen"
-            width="450px"
-            height="65px"
-            fontSize="30px"
-            padding="1.5rem"
-            buttonColor="#F6F9F4" // ボタンの背景色
-            textColor="#7648ec" // 文字の色
-            iconSize="20px" // アイコンのサイズ
-          >
-            ポーズ例を見てみよう！
-          </CustomButton>
-        </Link>
+        <CustomButton
+          to="/show-example-screen"
+          width="450px"
+          height="65px"
+          fontSize="30px"
+          padding="1.5rem"
+          buttonColor="#F6F9F4" // ボタンの背景色
+          textColor="#7648ec" // 文字の色
+          iconSize="20px" // アイコンのサイズ
+        >
+          ポーズ例を見てみよう！
+        </CustomButton>
       )}
     </Flex>
   );

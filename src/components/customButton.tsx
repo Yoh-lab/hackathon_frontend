@@ -5,7 +5,7 @@ import { ArrowRightIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 
 interface CustomButtonProps {
-  to: string;
+  to?: string;
   width: string;
   height: string;
   fontSize: string;
@@ -14,9 +14,10 @@ interface CustomButtonProps {
   buttonColor?: string;
   textColor?: string;
   iconSize?: string;
+  onClick?: () => void;
 }
 
-export default function CustomButton({ to, width, height, fontSize, padding, children, buttonColor='teal', textColor='white', iconSize='1em' }: CustomButtonProps) {
+export default function CustomButton({ to='', width, height, fontSize, padding, children, buttonColor='teal', textColor='white', iconSize='1em', onClick,}: CustomButtonProps) {
   return (
     <Link href={to}>
       <Box width={width} height={height}>
@@ -29,6 +30,7 @@ export default function CustomButton({ to, width, height, fontSize, padding, chi
           fontSize={fontSize}
           padding={padding}
           _hover={{ backgroundColor: '#f6f9f492' }} // Hover state
+          onClick={onClick}
         >
           {children}
           <ArrowRightIcon boxSize={iconSize} ml="0.5rem" />
