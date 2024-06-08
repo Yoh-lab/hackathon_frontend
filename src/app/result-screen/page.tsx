@@ -1,13 +1,17 @@
 "use client";
 
-import { Flex } from "@chakra-ui/react";
+import { Flex, Box } from "@chakra-ui/react";
 import { Text } from '@chakra-ui/react'
 import styles from '../../styles/Home.module.css';
 
 import React from 'react';
 import CustomButton from '../../components/customButton';
+
+import Example from "../../components/stepper";
+
 import { ResultBar } from "../../components/resultBar";
 import { useSimilarityScore } from "../contexts/similarityScoreContext";
+
 
 // 類似度と酔っ払いタイプの配列
 const drunkTypes = [
@@ -25,25 +29,30 @@ export default function Home() {
 
   return (
     <main className={styles.background}>
-      {/* vhでレイアウトは調節しよう！ */}
-      <Flex direction="column" justify="center" minH="100vh" gap={20}>
-        <ResultBar />
-        <Flex direction="column" align="center" justify="center" minH="40vh" gap={40}>
-          <Text className={styles.text} align="center">{drunkTypes[drunkTypeIndex].type}</Text>
-          <CustomButton
-              to="/"
-              width="450px"
-              height="75px"
-              fontSize="40px"
-              padding="1.5rem"
-              buttonColor="#F6F9F4" // ボタンの背景色
-              textColor="#7648ec" // 文字の色
-              iconSize="30px" // アイコンのサイズ
-            >
-              最初に戻る
-          </CustomButton>
+      <Box height="100%">
+        <Box height="20%">
+          <Example activeIndex={4} />
+        </Box>
+        {/* vhでレイアウトは調節しよう！ */}
+        <Flex direction="column" justify="center" minH="80vh" gap={20}>
+          <ResultBar />
+          <Flex direction="column" align="center" justify="center" minH="40vh" gap={40}>
+            <Text className={styles.text} align="center">{drunkTypes[drunkTypeIndex].type}</Text>
+            <CustomButton
+                to="/"
+                width="450px"
+                height="75px"
+                fontSize="40px"
+                padding="1.5rem"
+                buttonColor="#F6F9F4" // ボタンの背景色
+                textColor="#7648ec" // 文字の色
+                iconSize="30px" // アイコンのサイズ
+              >
+              最初に戻る　
+              </CustomButton>
+           </Flex>
         </Flex>
-      </Flex>
+      </Box>
     </main>
   );
 }
