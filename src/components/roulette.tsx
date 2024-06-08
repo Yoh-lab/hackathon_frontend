@@ -12,7 +12,7 @@ export const ItemContext = createContext('')
 
 export const Roulette = () => {
   // ルーレットの項目リスト
-  const items = ['ポーズA','ポーズB','ポーズC','ポーズD'];
+  const items = ['なんちゃってヨガ','さかな~','コナン'];
   // 現在表示されているルーレットの項目を示す状態
   const { currentPoseName, setCurrentPoseName } = useCurrentPoseName();
   // ルーレットが回転しているかどうかの状態
