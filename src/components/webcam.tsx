@@ -5,6 +5,7 @@ import { Button, ButtonGroup } from '@chakra-ui/react'
 import CustomButton from './customButton';
 import { usePoseImages } from '../app/contexts/poseImagesContext';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
+import { useSimilarityScore } from "@/app/contexts/similarityScoreContext";
 
 // Webカメラの設定（解像度やカメラの向き）
 const videoConstraints = {
@@ -19,6 +20,9 @@ const frameSize = {
   height: 360,
 };
 
+// 類似度計算の配列
+const similarityScoreList: number[] = [];
+
 export const WebCam_Window = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false);
   const webcamRef = useRef<Webcam>(null);
@@ -26,6 +30,8 @@ export const WebCam_Window = () => {
   const saveCanvasRef = useRef<HTMLCanvasElement>(null);
   const [processedImage, setProcessedImage] = useState<string>("");
   const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
+  // 類似度を示す状態
+  const { setSimilarityScore } = useSimilarityScore();
 
   // 正解画像のCanvasを作る
   // ポーズ名と画像のURLの配列をposeImagesContext.tsxから取得する
@@ -46,7 +52,10 @@ export const WebCam_Window = () => {
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(-1, 1); // 水平方向に反転
+            ctx.drawImage(img, 0, 0, -canvas.width, canvas.height);
+            ctx.restore();
         };
     } 
   }
@@ -89,7 +98,14 @@ export const WebCam_Window = () => {
       }
       const data = await response.blob();
 
-      return data;
+      // レスポンスのスコアを取得 (仮定としてJSONの一部から取得する場合)
+      const scoreResponse = await fetch('upload/score', {
+          method: 'GET'
+      });
+      const scoreData = await scoreResponse.json();
+      const score = scoreData.score;
+
+      return { image: data, score: score };
     } catch (error) {
       console.error("Error uploading image:", error);
       throw error;
@@ -112,15 +128,23 @@ export const WebCam_Window = () => {
         // 仮想的に0．5秒待機する（これをコメントアウトすればスムーズに動く）
         // await new Promise((resolve) => setTimeout(resolve, 100));
         try {
+          // resultはblob(処理画像)とnumber（類似度）を返す予定
           const result = await uploadImage(webcamCanvas as HTMLCanvasElement, correctCanvas);
+
           // 画像処理後の画像をcanvasに描画
           const img = new Image();
-          img.src = URL.createObjectURL(new Blob([result]));
+          img.src = URL.createObjectURL(new Blob([result.image]));
           // img.onload: 画像のロードが完了したときに呼び出されるコールバック関数
           img.onload = () => {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(-1, 1); // 水平方向に反転
+            ctx.drawImage(img, 0, 0, -canvas.width, canvas.height);
+            ctx.restore();
           };
-          //resultは画像処理後の画像．これをcanvasに描画
+
+          // 1フレームごとの類似度のスコアを保存
+          similarityScoreList.push(result.score)
+
         } catch (error) {
           console.error("Error during image upload:", error);
         }
@@ -133,6 +157,7 @@ export const WebCam_Window = () => {
     reqIdRef.current = requestAnimationFrame(processFrame);
   };
 
+
   useEffect(() => {
     if (isCaptureEnable) {
       console.log("processFrame Changing..."); // "processFrame Changing..."をコンソールに表示
@@ -140,7 +165,16 @@ export const WebCam_Window = () => {
       requestAnimationFrame(processFrame);
       // ページ遷移などコンポーネントが破棄されたときにループを止めなければならない
       // useEffectのreturnはそういう時にクリーンアップ関数として一度関数を呼ぶので、ループを止める関数をreturnに渡しておく
-      return () => cancelAnimationFrame(reqIdRef.current);
+      return () => {
+        cancelAnimationFrame(reqIdRef.current);
+
+        let sum = 0;
+        for (let i=0; i<similarityScoreList.length; i++) {
+          sum += similarityScoreList[i];
+        }
+
+        setSimilarityScore(sum / similarityScoreList.length);
+      }
     }
   }, [isCaptureEnable]);
 

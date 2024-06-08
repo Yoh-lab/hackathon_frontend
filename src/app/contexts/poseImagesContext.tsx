@@ -24,9 +24,9 @@ const poseImagesContext = createContext<poseImagesContextType>({
 // Providerコンポーネントの作成
 export const PoseImagesProvider = ({ children }: poseImagesProviderProps) => {
     const poseImages = [
-        {name: 'なんちゃってヨガ', imageSrc: 'URL', boneImageSrc: 'URL'},
-        {name: 'さかな~', imageSrc: 'URL', boneImageSrc: 'URL'},
-        {name: 'コナン', imageSrc: 'URL', boneImageSrc: 'URL'},
+        {name: 'なんちゃってヨガ', imageSrc: '/images/original/No2.jpg', boneImageSrc: '/images/bone/No2_a.jpg'},
+        {name: 'さかな~', imageSrc: '/images/original/No3.jpg', boneImageSrc: '/images/bone/No3_a.jpg'},
+        {name: 'コナン', imageSrc: '/images/original/No1.jpg', boneImageSrc: '/images/bone/No1_a.jpg'},
     ];
 
     return (
