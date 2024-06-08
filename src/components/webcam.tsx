@@ -51,6 +51,7 @@ export const WebCam_Window = () => {
       if (ctx) {
         const img = new Image();
         img.src = imageUrl;
+        console.log(img.src);
         img.onload = () => {
             ctx.save();
             ctx.scale(-1, 1); // 水平方向に反転
@@ -224,11 +225,13 @@ export const WebCam_Window = () => {
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
             />
-            {/* <img // URLではなくデータURIで直接画像を埋め込む。`${変数}`はJavaScriptのテンプレートリテラルで変数を埋め込める
-              src={`data:image/jpeg;base64,${processedImage}`} alt="Processed Image" 
-            /> */}
             <canvas
               ref={canvasRef}
+              width={frameSize.width}
+              height={frameSize.height}
+            />
+            <canvas
+              ref={correctCanvasRef}
               width={frameSize.width}
               height={frameSize.height}
             />
