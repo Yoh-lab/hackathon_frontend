@@ -177,38 +177,19 @@ export const WebCam_Window = () => {
   // 撮影ボタン押したとき
   // setIntervalのIDを保持
   const intervalRef = useRef<number | null>(null);
-  const [isCountable, setIsCountable] =  useState<boolean>(false);
-  const initialcount = 3;
-  const [count, setCount] = useState(initialcount);
-  const countDown = () => {
-    setIsCountable(true);
-
-    if (count > 0 && intervalRef.current === null) {
-      intervalRef.current = window.setInterval(() => {
-        setCount(prevCount => {
-          if (prevCount <= 1) {
-            clearInterval(intervalRef.current!);
-            intervalRef.current = null;
-            setIsCountable(false);
-            setCaptureEnable(true);
-            stopCapture();
-            return 0;
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-    }
-  };
-
-
+  // ボタンの表示
+  const [button, setButton] =  useState<boolean>(true);
   // 撮影始める
   const captureTime = 5;
+  const [count, setCount] = useState(captureTime)
   const stopCapture = () => {
+    // ボタン非表示
+    setButton(false);
     // 撮影時間をセット
     setCount(captureTime);
 
     // 描画の準備ができてから撮影時間が始まる
-    if (webcamRef.current ) {
+    if ( webcamRef.current && correctCanvasRef.current ) {
       if (count > 0 && intervalRef.current === null) {
         intervalRef.current = window.setInterval(() => {
           setCount(prevCount => {
@@ -216,7 +197,6 @@ export const WebCam_Window = () => {
               clearInterval(intervalRef.current!);
               intervalRef.current = null;
               // 撮影停止
-              setCaptureEnable(false);
               setIsCaptureFinished(true)
               return 0;
             }
@@ -227,45 +207,19 @@ export const WebCam_Window = () => {
     }
   };
 
+
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-
-      {isCaptureEnable || isCountable || isCaptureFinished || ( // 撮影ボタンを押す前
-        <>
-          <Text fontSize='4xl'>準備OK？？</Text>
-          <CustomButton
-            width="450px"
-            height="65px"
-            fontSize="30px"
-            padding="1.5rem"
-            buttonColor="#F6F9F4" // ボタンの背景色
-            textColor="#7648ec" // 文字の色
-            iconSize="20px" // アイコンのサイズ
-            onClick={() => countDown()}
-          >
-            撮影開始～！
-          </CustomButton>
-        </>
-      )}
-      {isCountable && (// 撮影ボタンを押した後カウントダウン開始
-        <>
-          <Center>
-            <CircularProgress value={100 * (count / initialcount)} color='green.400' size='120px'>
-                <CircularProgressLabel>{count}s</CircularProgressLabel>
-            </CircularProgress>
-          </Center>
-        </>
-      )}
-      {isCaptureEnable && ( // カウントダウン後
-        <>
+      {isCaptureEnable || isCaptureFinished || ( // 撮影ボタンを押す前
+        <>         
           <Flex direction="column" align="center" justify="center" gap={20}>
             <Flex align="center" justify="center" gap={20}>
               <Webcam //以下は全部Webcamコンポーネントに渡されるprops
                 audio={false}
-                width={frameSize.width}
-                height={frameSize.height}
+                width={frameSize.width/2}
+                height={frameSize.height/2}
                 ref={webcamRef}
                 screenshotFormat="image/jpeg"
                 videoConstraints={videoConstraints}
@@ -275,32 +229,34 @@ export const WebCam_Window = () => {
               </CircularProgress>
               <canvas
                 ref={correctCanvasRef}
-                width={frameSize.width}
-                height={frameSize.height}
+                width={frameSize.width/2}
+                height={frameSize.height/2}
               />
             </Flex>
-            <Box height="40%">
-              <canvas
-                ref={canvasRef}
-                width={frameSize.width}
-                height={frameSize.height}
-              />
-            </Box>
+            {button && (
+              <CustomButton
+                width="450px"
+                height="65px"
+                fontSize="30px"
+                padding="1.5rem"
+                buttonColor="#F6F9F4" // ボタンの背景色
+                textColor="#7648ec" // 文字の色
+                iconSize="20px" // アイコンのサイズ
+                onClick={() => stopCapture()}
+              >
+                撮影開始～！
+              </CustomButton>
+            )}
+            {button || (
+              <Box height="40%">
+                <canvas
+                  ref={canvasRef}
+                  width={frameSize.width}
+                  height={frameSize.height}
+                />
+              </Box>
+            )}
           </Flex>
-          <div>
-            <CustomButton
-              width="450px"
-              height="65px"
-              fontSize="30px"
-              padding="1.5rem"
-              buttonColor="#F6F9F4" // ボタンの背景色
-              textColor="#7648ec" // 文字の色
-              iconSize="20px" // アイコンのサイズ
-              onClick={stopCapture}
-            >
-              撮影終了～！
-            </CustomButton>
-          </div>
         </>
       )}
       {isCaptureFinished &&(
