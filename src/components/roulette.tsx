@@ -1,14 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 
 import { Flex, Box } from "@chakra-ui/react";
 import { Text } from '@chakra-ui/react'
 import { Button, ButtonGroup } from '@chakra-ui/react'
+import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
+
+// createContextでitemをコンポーネント間で共有できるようにする
+export const ItemContext = createContext('')
 
 export const Roulette = () => {
   // ルーレットの項目リスト
   const items = ['ポーズA','ポーズB','ポーズC','ポーズD'];
   // 現在表示されているルーレットの項目を示す状態
-  const [currentItem, setCurrentItem] = useState<string>(items[0]);
+  const { currentPoseName, setCurrentPoseName } = useCurrentPoseName();
   // ルーレットが回転しているかどうかの状態
   const [isRunning, setIsRunning] = useState<boolean>(false);
   // setIntervalのIDを保持
@@ -20,7 +24,7 @@ export const Roulette = () => {
       // window.setIntervalは指定した時間間隔ごとに指定した関数を繰り返し実行
       intervalRef.current = window.setInterval(() => {
         // prevItem:現在表示されているルーレットの項目
-        setCurrentItem(prevItem => {
+        setCurrentPoseName(prevItem => {
           // currentIndex:prevItemがitems配列の中で何番目にあるか
           const currentIndex = items.indexOf(prevItem);
           // 
@@ -44,7 +48,7 @@ export const Roulette = () => {
 
   return (
     <Flex direction="column" align="center" justify="center" gap={20}>
-      <Text fontSize='4xl'>{currentItem}</Text>
+      <Text fontSize='4xl'>{currentPoseName}</Text>
       {isRunning || (
         <Button colorScheme='teal' size='md' onClick={() => setIsRunning(true)}>ルーレットスタート！</Button>
       )}
