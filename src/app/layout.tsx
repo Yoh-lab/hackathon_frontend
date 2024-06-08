@@ -1,4 +1,5 @@
 import { Providers } from './providers'
+import { CurrentPoseNameProvider } from './contexts/currentPoseNameContext';
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -16,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}><Providers>{children}</Providers></body>
+      <body className={inter.className}><CurrentPoseNameProvider><Providers>{children}</Providers></CurrentPoseNameProvider></body>
     </html>
   );
 }
