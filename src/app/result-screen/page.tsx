@@ -13,19 +13,18 @@ import { ResultBar } from "../../components/resultBar";
 import { useSimilarityScore } from "../contexts/similarityScoreContext";
 
 
-// 類似度と酔っ払いタイプの配列
-const drunkTypes = [
-  {score: 25, type: 'まだ大丈夫!!'},
-  {score: 50, type: '少し抑えて!!'},
-  {score: 75, type: 'もう飲まないで！!'},
-  {score: 100, type: '病院行き!!'},
-];
-
 export default function Home() {
+  // 類似度と酔っ払いタイプの配列
+  const drunkTypes = [
+    {score: 25, type: 'まだ大丈夫!!'},
+    {score: 50, type: '少し抑えて!!'},
+    {score: 75, type: 'もう飲まないで！!'},
+    {score: 100, type: '病院行き!!'},
+  ];
   // 類似度を示す状態
   const { similarityScore } = useSimilarityScore();
   // 酔っ払いタイプの決定
-  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= similarityScore)
+  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= similarityScore);
 
   return (
     <main className={styles.background}>

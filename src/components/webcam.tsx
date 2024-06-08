@@ -2,6 +2,9 @@ import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Text } from '@chakra-ui/react'
 import { Flex, Box } from "@chakra-ui/react";
+import { CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
+import { Center, Square, Circle } from '@chakra-ui/react'
+
 import CustomButton from './customButton';
 import { usePoseImages } from '../app/contexts/poseImagesContext';
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
@@ -27,8 +30,6 @@ export const WebCam_Window = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false);
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const saveCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [processedImage, setProcessedImage] = useState<string>("");
   const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
   // 類似度を示す状態
   const { setSimilarityScore } = useSimilarityScore();
@@ -173,19 +174,65 @@ export const WebCam_Window = () => {
     }
   }, [isCaptureEnable]);
 
+  // 撮影ボタン押したとき
+  // setIntervalのIDを保持
+  const intervalRef = useRef<number | null>(null);
+  const [isCountable, setIsCountable] =  useState<boolean>(false);
+  const initialcount = 3;
+  const [count, setCount] = useState(initialcount);
+  const countDown = () => {
+    setIsCountable(true);
 
-  // 撮影止めたとき
+    if (count > 0 && intervalRef.current === null) {
+      intervalRef.current = window.setInterval(() => {
+        setCount(prevCount => {
+          if (prevCount <= 1) {
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+            setIsCountable(false);
+            setCaptureEnable(true);
+            stopCapture();
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
+    }
+  };
+
+
+  // 撮影始める
+  const captureTime = 5;
   const stopCapture = () => {
-    setCaptureEnable(false);
-    setIsCaptureFinished(true)
-  }
+    // 撮影時間をセット
+    setCount(captureTime);
+
+    // 描画の準備ができてから撮影時間が始まる
+    if (webcamRef.current ) {
+      if (count > 0 && intervalRef.current === null) {
+        intervalRef.current = window.setInterval(() => {
+          setCount(prevCount => {
+            if (prevCount <= 1) {
+              clearInterval(intervalRef.current!);
+              intervalRef.current = null;
+              // 撮影停止
+              setCaptureEnable(false);
+              setIsCaptureFinished(true)
+              return 0;
+            }
+            return prevCount - 1;
+          });
+        }, 1000);
+      }
+    }
+  };
 
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
 
-      {isCaptureFinished || isCaptureEnable || (
+      {isCaptureEnable || isCountable || isCaptureFinished || ( // 撮影ボタンを押す前
         <>
           <Text fontSize='4xl'>準備OK？？</Text>
           <CustomButton
@@ -196,13 +243,22 @@ export const WebCam_Window = () => {
             buttonColor="#F6F9F4" // ボタンの背景色
             textColor="#7648ec" // 文字の色
             iconSize="20px" // アイコンのサイズ
-            onClick={() => setCaptureEnable(true)}
+            onClick={() => countDown()}
           >
             撮影開始～！
           </CustomButton>
         </>
       )}
-      {isCaptureEnable && (
+      {isCountable && (// 撮影ボタンを押した後カウントダウン開始
+        <>
+          <Center>
+            <CircularProgress value={100 * (count / initialcount)} color='green.400' size='120px'>
+                <CircularProgressLabel>{count}s</CircularProgressLabel>
+            </CircularProgress>
+          </Center>
+        </>
+      )}
+      {isCaptureEnable && ( // カウントダウン後
         <>
           <Flex direction="column" align="center" justify="center" gap={20}>
             <Flex align="center" justify="center" gap={20}>
@@ -214,6 +270,9 @@ export const WebCam_Window = () => {
                 screenshotFormat="image/jpeg"
                 videoConstraints={videoConstraints}
               />
+              <CircularProgress value={100 * (count / captureTime)} color='green.400' size='60px'>
+                <CircularProgressLabel>{count}s</CircularProgressLabel>
+              </CircularProgress>
               <canvas
                 ref={correctCanvasRef}
                 width={frameSize.width}
