@@ -8,6 +8,8 @@ npm install
 
 npm i @chakra-ui/icons
 
+npm install @mui/material @emotion/react @emotion/styled
+
 ```bash
 npm run dev
 # or
