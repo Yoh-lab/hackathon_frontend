@@ -14,7 +14,7 @@ interface similarityScoreProviderProps {
 
 // コンテキストを作成
 const similarityScoreContext = createContext<similarityScoreContextType>({
-    similarityScore: 60,
+    similarityScore: 0.6,
     setSimilarityScore: () => {},
 });
 

@@ -8,7 +8,7 @@ export const ResultBar = () => {
 
   return (
     <Flex direction="column" justify="center" align="center" height="100%" gap={10}>
-      <Text className={styles.text} align="center">あなたの酔っ払い度は...{similarityScore}%</Text>
+      <Text className={styles.text} align="center">あなたの酔っ払い度は...{similarityScore * 100}%</Text>
         <Box width="50%">
           <Box position="relative" display="flex" alignItems="center">
             <Image
