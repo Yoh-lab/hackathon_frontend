@@ -8,7 +8,7 @@ export const ResultBar = () => {
 
   return (
     <Flex direction="column" justify="center" align="center" height="100%" gap={10}>
-      <Text className={styles.text} align="center">あなたの酔っ払い度は...{similarityScore}%</Text>
+      <Text className={styles.text} align="center">あなたの酔っ払い度は...{(1 - similarityScore) * 100}%</Text>
         <Box width="50%">
           <Box position="relative" display="flex" alignItems="center">
             <Image
@@ -28,7 +28,7 @@ export const ResultBar = () => {
                 bgGradient="linear(to-r, purple.500, pink.500)"
               />
               <Progress
-                value={similarityScore} // 進捗値
+                value={1 - similarityScore} // 進捗値
                 bg="transparent"
                 height="64px" // プログレスバーの高さ
                 borderRadius="full" // 丸み
