@@ -28,7 +28,7 @@ export const ResultBar = () => {
                 bgGradient="linear(to-r, purple.500, pink.500)"
               />
               <Progress
-                value={1 - similarityScore} // 進捗値
+                value={(1 - similarityScore)*100} // 進捗値
                 bg="transparent"
                 height="64px" // プログレスバーの高さ
                 borderRadius="full" // 丸み
