@@ -27,6 +27,7 @@ export default function Home() {
   const { similarityScore } = useSimilarityScore();
   // 酔っ払いタイプの決定
   const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= 1 - similarityScore);
+  const url = drunkTypeIndex !== -1 ? drunkTypes[drunkTypeIndex].type : ''; // 適切な画像が見つかった場合は URL を設定する
 
   return (
     <main className={styles.background}>
@@ -39,7 +40,7 @@ export default function Home() {
           <ResultBar />
           <Flex direction="column" align="center" justify="center" minH="40vh" gap={10}>
             {/* <Text className={styles.text} align="center">{drunkTypes[drunkTypeIndex].type}</Text> */}
-            <Image src={drunkTypes[drunkTypeIndex].type} alt="酔っ払いタイプ" className={styles.text} />
+            <Image src={url} alt="酔っ払いタイプ" className={styles.text} />
             <CustomButton
               to="/"
               width="450px"
