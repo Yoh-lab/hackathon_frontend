@@ -12,7 +12,7 @@ import Example from '../components/stepper';
 export default function Home() {
   return (
     <main className={styles.background}>
-      <Box height="100%">
+      <>
         <Box height="20%">
           <Example activeIndex={0} />
         </Box>
@@ -33,7 +33,7 @@ export default function Home() {
             診断開始！　
           </CustomButton>
         </Flex>
-      </Box>
+      </>
     </main>
   );
 }
