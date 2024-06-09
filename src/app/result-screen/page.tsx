@@ -26,7 +26,7 @@ export default function Home() {
   // 類似度を示す状態
   const { similarityScore } = useSimilarityScore();
   // 酔っ払いタイプの決定
-  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= similarityScore);
+  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= 1 - similarityScore);
 
   return (
     <main className={styles.background}>
