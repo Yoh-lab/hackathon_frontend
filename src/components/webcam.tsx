@@ -2,8 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Text } from "@chakra-ui/react";
 import { Flex, Box } from "@chakra-ui/react";
-import { CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
-import { Center, Square, Circle } from '@chakra-ui/react'
+import { CircularProgress, CircularProgressLabel } from "@chakra-ui/react";
+import { Center, Square, Circle } from "@chakra-ui/react";
 
 import CustomButton from "./customButton";
 import { usePoseImages } from "../app/contexts/poseImagesContext";
@@ -172,7 +172,7 @@ export const WebCam_Window = () => {
   // 撮影ボタン押したとき
   // setIntervalのIDを保持
   const intervalRef = useRef<number | null>(null);
-  const [isCountable, setIsCountable] =  useState<boolean>(false);
+  const [isCountable, setIsCountable] = useState<boolean>(false);
   const initialcount = 3;
   const [count, setCount] = useState(initialcount);
   const countDown = () => {
@@ -180,7 +180,7 @@ export const WebCam_Window = () => {
 
     if (count > 0 && intervalRef.current === null) {
       intervalRef.current = window.setInterval(() => {
-        setCount(prevCount => {
+        setCount((prevCount) => {
           if (prevCount == 0) {
             clearInterval(intervalRef.current!);
             intervalRef.current = null;
@@ -193,7 +193,6 @@ export const WebCam_Window = () => {
       }, 1000);
     }
   };
-
 
   // 撮影止めたとき
   const stopCapture = () => {
@@ -222,18 +221,30 @@ export const WebCam_Window = () => {
           </CustomButton>
         </>
       )}
-      {isCountable && (// 撮影ボタンを押した後カウントダウン開始
+      {isCountable && ( // 撮影ボタンを押した後カウントダウン開始
         <>
           <Center>
-            <CircularProgress value={100 * (count / initialcount)} color='green.400' size='120px'>
-                <CircularProgressLabel>{count}s</CircularProgressLabel>
+            <CircularProgress
+              value={100 * (count / initialcount)}
+              color="green.400"
+              size="120px"
+            >
+              <CircularProgressLabel>{count}s</CircularProgressLabel>
             </CircularProgress>
           </Center>
         </>
       )}
       {isCaptureEnable && (
         <>
-          <Flex direction="column" align="center" justify="center" gap={20}>
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            gap={20}
+            mt={10}
+            mx={10}
+            mb={10}
+          >
             <Flex align="center" justify="center" gap={20}>
               <Webcam //以下は全部Webcamコンポーネントに渡されるprops
                 audio={false}
@@ -243,11 +254,25 @@ export const WebCam_Window = () => {
                 screenshotFormat="image/jpeg"
                 videoConstraints={videoConstraints}
               />
-              <img
-                src={currentPoseImage?.boneImageSrc}
-                height={frameSize.height}
-                width={frameSize.width}
-              />
+              <div
+                style={{
+                  width: frameSize.width,
+                  height: frameSize.height,
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={currentPoseImage?.boneImageSrc}
+                  height={frameSize.height}
+                  width={frameSize.width}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover", // 画像を要素サイズにトリミング
+                    objectPosition: "center", // 画像の位置を中央に
+                  }}
+                />
+              </div>
             </Flex>
             <Box height="60%">
               <canvas
