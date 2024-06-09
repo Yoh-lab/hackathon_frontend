@@ -14,14 +14,14 @@ interface similarityScoreProviderProps {
 
 // コンテキストを作成
 const similarityScoreContext = createContext<similarityScoreContextType>({
-    similarityScore: 60,
+    similarityScore: 0.3,
     setSimilarityScore: () => {},
 });
 
 // Providerコンポーネントの作成
 export const SimilarityScoreProvider = ({ children }: similarityScoreProviderProps) => {
     // 類似度を示す状態
-    const [similarityScore, setSimilarityScore] = useState(60);
+    const [similarityScore, setSimilarityScore] = useState(0.3);
 
     return (
         <similarityScoreContext.Provider value={{ similarityScore, setSimilarityScore}}>

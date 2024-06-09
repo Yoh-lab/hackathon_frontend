@@ -16,17 +16,17 @@ import { useSimilarityScore } from "../contexts/similarityScoreContext";
 
 // 類似度と酔っ払いタイプの配列
 const drunkTypes = [
-  {score: 25, type: '../../../drunktypes/drunk25.svg'},
-  {score: 50, type: '../../../drunktypes/drunk50.svg'},
-  {score: 75, type: '../../../drunktypes/drunk75.svg'},
-  {score: 100, type: '../../../drunktypes/drunk100.svg'},
+  {score: 0.25, type: '../../../drunktypes/drunk25.svg'},
+  {score: 0.5, type: '../../../drunktypes/drunk50.svg'},
+  {score: 0.75, type: '../../../drunktypes/drunk75.svg'},
+  {score: 1, type: '../../../drunktypes/drunk100.svg'},
 ];
 
 export default function Home() {
   // 類似度を示す状態
   const { similarityScore } = useSimilarityScore();
   // 酔っ払いタイプの決定
-  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= similarityScore);
+  const drunkTypeIndex = drunkTypes.findIndex((item) => item.score >= 1 - similarityScore);
 
   return (
     <main className={styles.background}>
