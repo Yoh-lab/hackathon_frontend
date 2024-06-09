@@ -1,5 +1,4 @@
 import { Image } from '@chakra-ui/react'
-import { Text } from '@chakra-ui/react'
 import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
 import { usePoseImages } from '../app/contexts/poseImagesContext';
 
@@ -17,7 +16,12 @@ export const ShowPose = () => {
     // ポーズ名に一致する要素があれば、その画像を表示する
     if (currentPoseImage) {
         return (
-            <Image src={currentPoseImage.boneImageSrc} alt={currentPoseName} />
+            <Image 
+                src={currentPoseImage.boneImageSrc} 
+                alt={currentPoseName}
+                width="55%" 
+                height="auto"
+            />
         );
     } else {
         // ポーズ名に一致する要素がない場合は何も表示しない

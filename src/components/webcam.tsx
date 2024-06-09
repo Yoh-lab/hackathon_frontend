@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
-import { Text } from '@chakra-ui/react'
+import { Text } from "@chakra-ui/react";
 import { Flex, Box } from "@chakra-ui/react";
 import { CircularProgress, CircularProgressLabel } from '@chakra-ui/react'
 import { Center, Square, Circle } from '@chakra-ui/react'
 
-import CustomButton from './customButton';
-import { usePoseImages } from '../app/contexts/poseImagesContext';
-import { useCurrentPoseName } from '../app/contexts/currentPoseNameContext';
+import CustomButton from "./customButton";
+import { usePoseImages } from "../app/contexts/poseImagesContext";
+import { useCurrentPoseName } from "../app/contexts/currentPoseNameContext";
 import { useSimilarityScore } from "@/app/contexts/similarityScoreContext";
 
 // Webカメラの設定（解像度やカメラの向き）
@@ -30,6 +30,8 @@ export const WebCam_Window = () => {
   const [isCaptureEnable, setCaptureEnable] = useState<boolean>(false);
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const saveCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [processedImage, setProcessedImage] = useState<string>("");
   const [isCaptureFinished, setIsCaptureFinished] = useState<boolean>(false);
   // 類似度を示す状態
   const { setSimilarityScore } = useSimilarityScore();
@@ -40,33 +42,12 @@ export const WebCam_Window = () => {
   // // ルーレットで当たったポーズをcurrentPoseName.tsxから取得する
   const { currentPoseName } = useCurrentPoseName();
   // // ポーズ名に一致する要素を探す
-  const currentPoseImage = poseImages.find((item) => item.name === currentPoseName)
-  // // 正解画像のCanvas
-  const correctCanvasRef = useRef<HTMLCanvasElement>(null);
-  const correctCanvas = correctCanvasRef.current;
-  // // 画像をロードしてCanvasに描画する関数
-  function loadImageToCanvas(imageUrl: string, canvas: HTMLCanvasElement) {
-      const ctx= canvas.getContext('2d');
-      if (ctx) {
-        const img = new Image();
-        img.src = imageUrl;
-        console.log(img.src);
-        img.onload = () => {
-            ctx.save();
-            ctx.scale(-1, 1); // 水平方向に反転
-            ctx.drawImage(img, 0, 0, -canvas.width, canvas.height);
-            ctx.restore();
-        };
-    } 
-  }
-  // // 画像URLとCanvas要素を渡して関数を呼び出す
-  if (currentPoseImage){
-    const imageUrl = currentPoseImage.imageSrc;
-    if (imageUrl && correctCanvas) {
-      loadImageToCanvas(imageUrl, correctCanvas);
-    }
-  } 
-  
+  const currentPoseImage = poseImages.find(
+    (item) => item.name === currentPoseName
+  );
+  console.log("currentPoseImage");
+  console.log(currentPoseImage?.boneImageSrc);
+  const [currentImageBlob, setCurrentImageBlob] = useState<Blob | null>(null);
 
   // Blobはバイナリデータを表現するためのオブジェクトで、通常画像や動画などのメディアデータを表現
   function getCanvasBlob(canvas: HTMLCanvasElement) {
@@ -76,16 +57,16 @@ export const WebCam_Window = () => {
       }, "image/png");
     });
   }
-  
+
   // webcamの取得画像のcanvasと正解画像のcorrectCanvasをバックエンドに渡し、処理画像と類似度の値を得る
-  const uploadImage = async (canvas: HTMLCanvasElement, correctCanvas: HTMLCanvasElement) => {
+  const uploadImage = async (canvas: HTMLCanvasElement, correctBlob: Blob) => {
     const blob = await getCanvasBlob(canvas);
-    const correctBlob = await getCanvasBlob(correctCanvas);
+    // const correctBlob = await getCanvasBlob(correctCanvas);
     // FormDataは、フォームデータをキー/値のペアとしてエンコードするためのオブジェクトで、HTTPリクエストで送信する際に使用
     const formData = new FormData();
     // 第一引数にはキーを指定し、第二引数には追加する値、第三引数には、データの名前やファイル名を指定
-    formData.append("data", blob as File, "canvas.png");
-    formData.append("data", correctBlob as File, "correctCanvas.png");
+    formData.append("data1", blob as File, "canvas.png");
+    formData.append("data2", correctBlob as File, "correctCanvas.png");
     try {
       const response = await fetch("http://localhost:8000", {
         method: "POST",
@@ -119,28 +100,34 @@ export const WebCam_Window = () => {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d"); //ctxを用いて描画コンテキストにアクセス可能
 
-      if (ctx && webcamCanvas && correctCanvas) {
+      if (ctx && webcamCanvas && currentImageBlob) {
         // 仮想的に0．5秒待機する（これをコメントアウトすればスムーズに動く）
         // await new Promise((resolve) => setTimeout(resolve, 100));
         try {
           // resultはblob(処理画像)とnumber（類似度）を返す予定
-          const result = await uploadImage(webcamCanvas as HTMLCanvasElement, correctCanvas);
-
+          const result = await uploadImage(
+            webcamCanvas as HTMLCanvasElement,
+            currentImageBlob
+          );
+          const image = result.image;
+          const score = result.score;
+          console.log("score:");
+          console.log(score);
           // 画像処理後の画像をcanvasに描画
           const img = new Image();
-          img.src = URL.createObjectURL(new Blob([result.image]));
-          // img.onload: 画像のロードが完了したときに呼び出されるコールバック関数
+          img.src = URL.createObjectURL(new Blob([image]));
           img.onload = () => {
-            ctx.save();
-            ctx.scale(-1, 1); // 水平方向に反転
-            ctx.drawImage(img, 0, 0, -canvas.width, canvas.height);
-            ctx.restore();
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           };
-
+          // img.onload: 画像のロードが完了したときに呼び出されるコールバック関数
+          // img.onload = () => {
+          //   ctx.save();
+          //   ctx.scale(-1, 1); // 水平方向に反転
+          //   ctx.drawImage(img, 0, 0, -canvas.width, canvas.height);
+          //   ctx.restore();
+          // };
           // 1フレームごとの類似度のスコアを保存
-          similarityScoreList.push(result.score)
-
-          
+          similarityScoreList.push(score);
         } catch (error) {
           console.error("Error during image upload:", error);
         }
@@ -153,7 +140,6 @@ export const WebCam_Window = () => {
     reqIdRef.current = requestAnimationFrame(processFrame);
   };
 
-
   useEffect(() => {
     if (isCaptureEnable) {
       console.log("processFrame Changing..."); // "processFrame Changing..."をコンソールに表示
@@ -165,101 +151,129 @@ export const WebCam_Window = () => {
         cancelAnimationFrame(reqIdRef.current);
 
         let sum = 0;
-        for (let i=0; i<similarityScoreList.length; i++) {
+        for (let i = 0; i < similarityScoreList.length; i++) {
           sum += similarityScoreList[i];
         }
 
         setSimilarityScore(sum / similarityScoreList.length);
-      }
+      };
     }
   }, [isCaptureEnable]);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const response = await fetch(currentPoseImage?.boneImageSrc as string);
+      const blob = await response.blob();
+      setCurrentImageBlob(blob);
+    };
+    fetchImage();
+  }, []);
 
   // 撮影ボタン押したとき
   // setIntervalのIDを保持
   const intervalRef = useRef<number | null>(null);
-  // ボタンの表示
-  const [button, setButton] =  useState<boolean>(true);
-  // 撮影始める
-  const captureTime = 5;
-  const [count, setCount] = useState(captureTime)
-  const stopCapture = () => {
-    // ボタン非表示
-    setButton(false);
-    // 撮影時間をセット
-    setCount(captureTime);
+  const [isCountable, setIsCountable] =  useState<boolean>(false);
+  const initialcount = 3;
+  const [count, setCount] = useState(initialcount);
+  const countDown = () => {
+    setIsCountable(true);
 
-    // 描画の準備ができてから撮影時間が始まる
-    if ( webcamRef.current && correctCanvasRef.current ) {
-      if (count > 0 && intervalRef.current === null) {
-        intervalRef.current = window.setInterval(() => {
-          setCount(prevCount => {
-            if (prevCount <= 1) {
-              clearInterval(intervalRef.current!);
-              intervalRef.current = null;
-              // 撮影停止
-              setIsCaptureFinished(true)
-              return 0;
-            }
-            return prevCount - 1;
-          });
-        }, 1000);
-      }
+    if (count > 0 && intervalRef.current === null) {
+      intervalRef.current = window.setInterval(() => {
+        setCount(prevCount => {
+          if (prevCount == 0) {
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+            setIsCountable(false);
+            setCaptureEnable(true);
+            return 0;
+          }
+          return prevCount - 1;
+        });
+      }, 1000);
     }
   };
 
+
+  // 撮影止めたとき
+  const stopCapture = () => {
+    setCaptureEnable(false);
+    setIsCaptureFinished(true);
+  };
 
   return (
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {isCaptureEnable || isCaptureFinished || ( // 撮影ボタンを押す前
-        <>         
+      {isCaptureFinished || isCountable || isCaptureEnable || (
+        <>
+          <Text fontSize="4xl">準備OK？？</Text>
+          <CustomButton
+            width="450px"
+            height="65px"
+            fontSize="30px"
+            padding="1.5rem"
+            buttonColor="#F6F9F4" // ボタンの背景色
+            textColor="#7648ec" // 文字の色
+            iconSize="20px" // アイコンのサイズ
+            onClick={() => countDown()}
+          >
+            撮影開始～！
+          </CustomButton>
+        </>
+      )}
+      {isCountable && (// 撮影ボタンを押した後カウントダウン開始
+        <>
+          <Center>
+            <CircularProgress value={100 * (count / initialcount)} color='green.400' size='120px'>
+                <CircularProgressLabel>{count}s</CircularProgressLabel>
+            </CircularProgress>
+          </Center>
+        </>
+      )}
+      {isCaptureEnable && (
+        <>
           <Flex direction="column" align="center" justify="center" gap={20}>
             <Flex align="center" justify="center" gap={20}>
               <Webcam //以下は全部Webcamコンポーネントに渡されるprops
                 audio={false}
-                width={frameSize.width/2}
-                height={frameSize.height/2}
+                width={frameSize.width}
+                height={frameSize.height}
                 ref={webcamRef}
                 screenshotFormat="image/jpeg"
                 videoConstraints={videoConstraints}
               />
-              <CircularProgress value={100 * (count / captureTime)} color='green.400' size='60px'>
-                <CircularProgressLabel>{count}s</CircularProgressLabel>
-              </CircularProgress>
-              <canvas
-                ref={correctCanvasRef}
-                width={frameSize.width/2}
-                height={frameSize.height/2}
+              <img
+                src={currentPoseImage?.boneImageSrc}
+                height={frameSize.height}
+                width={frameSize.width}
               />
             </Flex>
-            {button && (
-              <CustomButton
-                width="450px"
-                height="65px"
-                fontSize="30px"
-                padding="1.5rem"
-                buttonColor="#F6F9F4" // ボタンの背景色
-                textColor="#7648ec" // 文字の色
-                iconSize="20px" // アイコンのサイズ
-                onClick={() => stopCapture()}
-              >
-                撮影開始～！
-              </CustomButton>
-            )}
-            {button || (
-              <Box height="40%">
-                <canvas
-                  ref={canvasRef}
-                  width={frameSize.width}
-                  height={frameSize.height}
-                />
-              </Box>
-            )}
+            <Box height="60%">
+              <canvas
+                ref={canvasRef}
+                width={frameSize.width}
+                height={frameSize.height}
+              />
+            </Box>
           </Flex>
+          <div>
+            <CustomButton
+              width="450px"
+              height="65px"
+              fontSize="30px"
+              padding="1.5rem"
+              buttonColor="#F6F9F4" // ボタンの背景色
+              textColor="#7648ec" // 文字の色
+              iconSize="20px" // アイコンのサイズ
+              onClick={stopCapture}
+            >
+              撮影終了～！
+            </CustomButton>
+          </div>
         </>
       )}
-      {isCaptureFinished &&(
+      {isCaptureFinished && (
         <CustomButton
           to="/result-screen"
           width="450px"
