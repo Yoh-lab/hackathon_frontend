@@ -117,10 +117,10 @@ export const WebCam_Window = () => {
           const img = new Image();
           img.src = URL.createObjectURL(new Blob([image]));
           img.onload = () => {
-            ctx.save();
-            ctx.scale(-1, 1); // 水平方向に反転
+            // ctx.save();
+            // ctx.scale(-1, 1); // 水平方向に反転
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
+            // ctx.restore();
           };
           // img.onload: 画像のロードが完了したときに呼び出されるコールバック関数
           // img.onload = () => {
